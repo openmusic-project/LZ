@@ -5,59 +5,30 @@
 
 (in-package :om)
 
+
+; UTILITIES
+
+;;; LZ operates on data formatted by OM function MF-INFO
 ;;; mf-info gives : (midi-number, onset-time(ms), duration(ms), velocity, channel)
 
-(defmacro note-onset (note) `(second ,note))
-(defmacro note-pitch (note) `(first ,note))
-(defmacro note-channel (note) `(fifth ,note))
-(defmacro note-duration (note) `(third ,note))
-(defmacro note-velocity (note) `(fourth ,note))
+(defmacro lz-note-onset (note) `(second ,note))
+(defmacro lz-note-pitch (note) `(first ,note))
+(defmacro lz-note-channel (note) `(fifth ,note))
+(defmacro lz-note-duration (note) `(third ,note))
+(defmacro lz-note-velocity (note) `(fourth ,note))
  
-;;; UTILITIES
-
 (defun hashlist (table)
   (let ((set nil))
-    (maphash #'(lambda (x y)
-                 (setf set (append (mapcar #'(lambda (z)
-                                               (list z x))
-                                           y)
-                                   set)))
-             table)
+    (maphash 
+     #'(lambda (x y)
+         (setf set (append 
+                    (mapcar #'(lambda (z) (list z x)) y)
+                    set)))
+     table)
     set))
 
 
-;;; LZ DATA IS TOO BIG: NEVER SAVE/LOCK THE VALUE
-
-(defclass boxforlz (OMBoxCall) ())
-
-(defmethod get-boxcallclass-fun ((self (eql 'LZify))) 'boxforlz)
-
-(defmethod omNG-save ((self boxforlz) &optional (values? nil))
-  "Save a box"
-  (let* ((inputs (mapcar #'(lambda (input) (omNG-save input values?)) (inputs self)))
-         )
-    `(om-load-boxcall ',(saveBox? self) ,(name self) ',(save-reference self) ',inputs ,(om-save-point (frame-position self)) 
-                      ,(om-save-point (frame-size self)) nil nil ,(frame-name self) ,(numouts self))))
-
-(defun update-lz-boxes (oldbox newbox)
-  (setf (value newbox) nil)
-  (setf (frame-position newbox) (borne-position (frame-position oldbox)))
-  (setf (frame-size newbox) (frame-size oldbox))
-  (setf (frame-name newbox) (frame-name oldbox))
-  (setf (allow-lock newbox) nil)
-  (setf (inputs newbox) (eval (omNG-copy (inputs oldbox))))
-  (set-box-to-inputs (inputs newbox) newbox)
-  newbox)
-
-(defmethod omNG-copy ((self boxforlz))
-  `(let* ((copy ,(omNG-make-new-boxcall (fdefinition (reference self))
-                                        (frame-position self)
-                                        (name self))))
-     (setf copy (update-lz-boxes ,self copy))
-     copy))
-
-
-;;; CLASSES
+; CLASSES
 
 (defclass LZtree ()
   ((symb :initform 0 :accessor symb :initarg :symb)
@@ -92,8 +63,8 @@
    (reconstr :type function :accessor reconstr :initarg :reconstr)))
 
 (defclass PSTnode (LZtree)
-  (;(nbnext :initform 0 :type integer :accessor nbnext)
-   (next :initform (make-hash-table :test 'equal) :type hashtable :accessor next :initarg :next)
+  ((next :initform (make-hash-table :test 'equal) :type hashtable :accessor next :initarg :next)
+   ;(nbnext :initform 0 :type integer :accessor nbnext)
    (mark :initform nil :initarg :mark :accessor mark)
    (pos :accessor pos :initarg :pos :initform nil)))
 
@@ -105,53 +76,6 @@
   ((proba :accessor proba :initarg :proba :initform 0)
    (secund :accessor secund :initarg :secund :initform nil)))
 
-;(defmethod omng-save ((self LZpatterntree) &optional (values? nil))
-;  `(make-instance 'LZpatterntree
-;     :secund ,(omng-save (secund self))
-;     :symb ,(omng-save (symb self))
-;     :children ,(omng-save (children self))))
-
-;(defmethod omng-save ((self LZconttree) &optional (values? nil))
-;  `(make-instance 'LZconttree
-;     :dico ,(omng-save (dico self))
-;     :reconstr (symbol-function ,(omng-save (function-name (reconstr self))))))
-
-;(defmethod omng-save ((self LZcontnode) &optional (values? nil))
-;  `(make-instance 'LZcontnode
-;     :symb ,(omng-save (symb self))
-;     :children ,(omng-save (children self))
-;     :subsize nil
-;     :next ,(omng-save (next self))))
-
-;(defmethod omng-save ((self LZnext) &optional (values? nil))
-;  `(make-instance 'LZnext
-;     :symb ,(omng-save (symb self))
-;     :proba ,(omng-save (proba self))
-;     :secund ,(omng-save (secund self))))
-
-;(defmethod omng-copy ((self LZpatterntree))
-;  `(make-instance 'LZpatterntree
-;     :secund ,(omng-copy (secund self))
-;     :symb ,(omng-copy (symb self))
-;     :children ,(omng-copy (children self))))
-
-;(defmethod omng-copy ((self LZconttree))
-;  `(make-instance 'LZconttree
-;     :dico ,(omng-copy (dico self))
-;     :reconstr ,(omng-copy (reconstr self))))
-
-;(defmethod omng-copy ((self LZcontnode))
-;  `(make-instance 'LZcontnode
-;     :symb ,(omng-copy (symb self))
-;     :children ,(omng-copy (children self))
-;     :subsize nil
-;     :next ,(omng-copy (next self))))
-
-;(defmethod omng-copy ((self LZnext))
-;  `(make-instance 'LZnext
-;     :symb ,(omng-copy (symb self))
-;     :proba ,(omng-copy (proba self))
-;     :secund ,(omng-copy (secund self))))
 
 (defun posintree (subtree tree)
   (if (eq tree subtree)
@@ -163,63 +87,65 @@
 
 ;;; FUNCTIONS USED AS MAIN INFORMATION SYMBOL FILTER FOR LZIFY
 
-(defun all (symb)
-  symb)
+(defun lz-all (symb) symb)
 
-(defun pitch (symb)
-  (mapcar #'(lambda (channel)
-                        (if (listp channel)
-                          (mapcar #'car channel)
-                          0))
-                    (car symb)))
+(defun lz-pitch (symb)
+  (mapcar 
+   #'(lambda (channel)
+       (if (listp channel)
+           (mapcar #'car channel)
+         0))
+   (car symb)))
 
-(defun newpitch (symb)
-  (mapcar #'(lambda (channel)
-                        (if (listp channel)
-                          (or (mapcan #'(lambda (x)
-                                          (and (> x 0) (list x)))
-                                      (mapcar #'car channel)) 0)
-                          0))
-                    (car symb)))
+(defun lz-newpitch (symb)
+  (mapcar 
+   #'(lambda (channel)
+       (if (listp channel)
+           (or (mapcan #'(lambda (x)
+                           (and (> x 0) (list x)))
+                       (mapcar #'car channel)) 0)
+         0))
+   (car symb)))
 
-(defun pitchduration (symb)
-  (list (pitch symb)
+(defun lz-pitchduration (symb)
+  (list (lz-pitch symb)
         (cadr symb)))
 
-(defun newpitchduration (symb)
-  (list (newpitch symb)
+(defun lz-newpitchduration (symb)
+  (list (lz-newpitch symb)
         (cadr symb)))
 
 ;;; FUNCTIONS USED AS SECUNDARY INFORMATION SYMBOL FILTER FOR LZIFY
 
-(defun oldpitch (symb)
-  (mapcar #'(lambda (channel)
-                        (if (listp channel)
-                          (or (mapcan #'(lambda (x)
-                                          (and (<= x 0) (list x)))
-                                      (mapcar #'car channel)) 0)
-                          0))
-                    (car symb)))
+(defun lz-oldpitch (symb)
+  (mapcar 
+   #'(lambda (channel)
+       (if (listp channel)
+           (or (mapcan #'(lambda (x)
+                           (and (<= x 0) (list x)))
+                       (mapcar #'car channel)) 0)
+         0))
+   (car symb)))
 
-(defun lzduration (symb)
+(defun lz-duration (symb)
   (cadr symb))
 
-(defun durationoldpitch (symb)
-  (list (lzduration symb)
-        (oldpitch symb)))
+(defun lz-durationoldpitch (symb)
+  (list (lz-duration symb)
+        (lz-oldpitch symb)))
 
-(defun velocity (symb)
+(defun lz-velocity (symb)
   (mapcar #'(lambda (channel)
               (if (listp channel)
                 (mapcar #'cadr channel)
                 0))
           (car symb)))
 
-(defun durationvelocity (symb)
-  (list (lzduration symb)
-        (velocity symb)))
+(defun lz-durationvelocity (symb)
+  (list (lz-duration symb)
+        (lz-velocity symb)))
 
-(defun oldpitchvelocity (symb)
+(defun lz-oldpitchvelocity (symb)
   (list (mapcar #'(lambda (channel)
                     (if (listp channel)
                       (or (mapcan #'(lambda (x)
@@ -235,12 +161,12 @@
                       0))
                 (car symb))))
 
-(defun durationoldpitchvelocity (symb)
-  (cons (lzduration symb)
-        (oldpitchvelocity symb)))
+(defun lz-durationoldpitchvelocity (symb)
+  (cons (lz-duration symb)
+        (lz-oldpitchvelocity symb)))
 
-(defun nothing (symb)
-  nil)
+(defun lz-nothing (symb) nil)
+
 
 ;;; FUNCTIONS USED AS SYMBOL RECONSTRUCTOR FOR LZGENERATE
 
@@ -695,8 +621,7 @@ an integer.
    (LZsize (dico tree)))
    
 
-(defmethod! LZsize ((nothing null))
-  0)
+(defmethod! LZsize ((nothing null)) 0)
 
 (defmethod member-p ((tree LZpatterntree) (prefix list) (secundlist list) (main function) (secundary function))
   (and prefix
@@ -1018,37 +943,37 @@ with their corresponding probabilities.
                             (if (listp type)
                               (car type)
                               (if (some #'ftype '(pitch_duration pitch_durationvelocity pitch_duration_last pitch_durationvelocity_last pitch_duration_last_velocity))
-                                #'pitch
+                                #'lz-pitch
                                 (if (some #'ftype '(pitchduration_nothing pitchduration_velocity))
-                                  #'pitchduration
+                                  #'lz-pitchduration
                                   (if (some #'ftype '(newpitch_durationoldpitch newpitch_durationoldpitchvelocity newpitch_durationoldpitch_last
                                                       newpitch_durationoldpitchvelocity_last newpitch_duration_last_oldpitchvelocity_last))
-                                    #'newpitch
+                                    #'lz-newpitch
                                     (if (some #'ftype '(newpitchduration_oldpitch newpitchduration_oldpitchvelocity))
-                                      #'newpitchduration
+                                      #'lz-newpitchduration
                                       (if (some #'ftype '(degenerated))
-                                        #'all))))))
+                                        #'lz-all))))))
                             (if (listp type)
                               (cadr type)
                               (if (some #'ftype '(pitch_duration pitch_duration_last))
-                                #'duration
+                                #'lz-duration
                                 (if (some #'ftype '(pitch_durationvelocity pitch_durationvelocity_last pitch_duration_last_velocity))
-                                  #'durationvelocity
+                                  #'lz-durationvelocity
                                   (if (some #'ftype '(pitchduration_nothing))
-                                    #'nothing
+                                    #'lz-nothing
                                     (if (some #'ftype '(pitchduration_velocity))
-                                      #'velocity
+                                      #'lz-velocity
                                       (if (some #'ftype '(newpitch_durationoldpitch newpitch_durationoldpitch_last))
-                                        #'durationoldpitch
+                                        #'lz-durationoldpitch
                                         (if (some #'ftype '(newpitch_durationoldpitchvelocity newpitch_durationoldpitchvelocity_last
                                                             newpitch_duration_last_oldpitchvelocity_last))
-                                          #'durationoldpitchvelocity
+                                          #'lz-durationoldpitchvelocity
                                           (if (some #'ftype '(newpitchduration_oldpitch))
-                                            #'oldpitch
+                                            #'lz-oldpitch
                                             (if (some #'ftype '(newpitchduration_oldpitchvelocity))
-                                              #'oldpitchvelocity
+                                              #'lz-oldpitchvelocity
                                               (if (some #'ftype '(degenerated))
-                                                #'nothing))))))))))))
+                                                #'lz-nothing))))))))))))
        (values
         (make-instance 'LZconttree
           :dico (mk-continuation-tree tree)
@@ -1105,37 +1030,37 @@ a PST (Prediction Suffix Tree)
                      (if (listp type)
                        (car type)
                        (if (some #'ftype '(pitch_duration pitch_durationvelocity pitch_duration_last pitch_durationvelocity_last pitch_duration_last_velocity))
-                         #'pitch
+                         #'lz-pitch
                          (if (some #'ftype '(pitchduration_nothing pitchduration_velocity))
-                           #'pitchduration
+                           #'lz-pitchduration
                            (if (some #'ftype '(newpitch_durationoldpitch newpitch_durationoldpitchvelocity newpitch_durationoldpitch_last
                                                newpitch_durationoldpitchvelocity_last newpitch_duration_last_oldpitchvelocity_last))
-                             #'newpitch
+                             #'lz-newpitch
                              (if (some #'ftype '(newpitchduration_oldpitch newpitchduration_oldpitchvelocity))
-                               #'newpitchduration
+                               #'lz-newpitchduration
                                (if (some #'ftype '(degenerated))
-                                 #'all))))))
+                                 #'lz-all))))))
                      (if (listp type)
                        (cadr type)
                        (if (some #'ftype '(pitch_duration pitch_duration_last))
-                         #'duration
+                         #'lz-duration
                          (if (some #'ftype '(pitch_durationvelocity pitch_durationvelocity_last pitch_duration_last_velocity))
-                           #'durationvelocity
+                           #'lz-durationvelocity
                            (if (some #'ftype '(pitchduration_nothing))
-                             #'nothing
+                             #'lz-nothing
                              (if (some #'ftype '(pitchduration_velocity))
-                               #'velocity
+                               #'lz-velocity
                                (if (some #'ftype '(newpitch_durationoldpitch newpitch_durationoldpitch_last))
-                                 #'durationoldpitch
+                                 #'lz-durationoldpitch
                                  (if (some #'ftype '(newpitch_durationoldpitchvelocity newpitch_durationoldpitchvelocity_last
                                                      newpitch_duration_last_oldpitchvelocity_last))
-                                   #'durationoldpitchvelocity
+                                   #'lz-durationoldpitchvelocity
                                    (if (some #'ftype '(newpitchduration_oldpitch))
-                                     #'oldpitch
+                                     #'lz-oldpitch
                                      (if (some #'ftype '(newpitchduration_oldpitchvelocity))
-                                       #'oldpitchvelocity
+                                       #'lz-oldpitchvelocity
                                        (if (some #'ftype '(degenerated))
-                                         #'nothing))))))))))
+                                         #'lz-nothing))))))))))
                      Pmin a ymin r L)
        :reconstr (if (listp type)
                    (caddr type)
@@ -1418,6 +1343,8 @@ Thanks to the minPast parameter, you can prevent PSTGenerate from generating wit
                        dynresult))))
     (reverse dynresult)))
 
+
+;;; !! this function uses unbound variables !! 
 (defun PSTGeneratecont (tree Length minPast incipit1 incipit2 reconstr strategy constraints equiv1 equiv2 mostprobable)
   (let ((size (LZlength tree)))
     (labels ((try (i past dynpast cont)
@@ -2055,10 +1982,10 @@ from getting stuck inside a little subtree.
 (defun thread (prevs nbchan)
   (let ((chord (make-list nbchan :initial-element 0)))
     (loop for prev in prevs
-          do (setf (nth (1- (note-channel (car prev))) chord)
-                   (if (listp (nth (1- (note-channel (car prev))) chord))
-                     (push (list (- (note-pitch (car prev))) (note-velocity (car prev))) (nth (1- (note-channel (car prev))) chord))
-                     (list (list (- (note-pitch (car prev))) (note-velocity (car prev)))))))
+          do (setf (nth (1- (lz-note-channel (car prev))) chord)
+                   (if (listp (nth (1- (lz-note-channel (car prev))) chord))
+                     (push (list (- (lz-note-pitch (car prev))) (lz-note-velocity (car prev))) (nth (1- (lz-note-channel (car prev))) chord))
+                     (list (list (- (lz-note-pitch (car prev))) (lz-note-velocity (car prev)))))))
     chord))
 
 (defun sortchord (chord)
@@ -2091,18 +2018,18 @@ from getting stuck inside a little subtree.
         (prev nil))
     (loop with events = voice
           while events
-          do (loop with onset = (note-onset (car events))
+          do (loop with onset = (lz-note-onset (car events))
                    with chord = (thread prev nbchan)
                    with prevc = (sort prev #'< :key #'cadr)
                    initially (setq chord (sortchord chord))
                    for prevent on prevc
                    while (<= (cadar prevent) onset)
                    do  (progn
-                         (if (atom (nth (1- (note-channel (caar prevent))) chord))
+                         (if (atom (nth (1- (lz-note-channel (caar prevent))) chord))
                              nil;(print "Warning : channel already empty")
-                             (setf (nth (1- (note-channel (caar prevent))) chord)
-                                 (or (delete (note-pitch (caar prevent))
-                                             (nth (1- (note-channel (caar prevent))) chord)
+                             (setf (nth (1- (lz-note-channel (caar prevent))) chord)
+                                 (or (delete (lz-note-pitch (caar prevent))
+                                             (nth (1- (lz-note-channel (caar prevent))) chord)
                                              :test #'(lambda (x y) (= (abs x) (abs y)))
                                              :key #'car)
                                      0)))
@@ -2117,18 +2044,18 @@ from getting stuck inside a little subtree.
                                     (setq prev prevc)
                                     (loop with events2 = events 
                                           while (and events2
-                                                     (= (note-onset (car events2)) onset))
-                                          do (progn (setf (nth (1- (note-channel (car events2))) chord)
-                                                          (if (listp (nth (1- (note-channel (car events2))) chord))
-                                                            (push (list (note-pitch (car events2))
-                                                                        (note-velocity (car events2)))
-                                                                  (nth (1- (note-channel (car events2))) chord))
-                                                            (list (list (note-pitch (car events2))
-                                                                        (note-velocity (car events2))))))
+                                                     (= (lz-note-onset (car events2)) onset))
+                                          do (progn (setf (nth (1- (lz-note-channel (car events2))) chord)
+                                                          (if (listp (nth (1- (lz-note-channel (car events2))) chord))
+                                                            (push (list (lz-note-pitch (car events2))
+                                                                        (lz-note-velocity (car events2)))
+                                                                  (nth (1- (lz-note-channel (car events2))) chord))
+                                                            (list (list (lz-note-pitch (car events2))
+                                                                        (lz-note-velocity (car events2))))))
                                                     (setq prev
                                                           (push (list (car events2)
-                                                                      (+ (note-onset (car events2))
-                                                                         (note-duration (car events2))))
+                                                                      (+ (lz-note-onset (car events2))
+                                                                         (lz-note-duration (car events2))))
                                                                 prev))
                                                     (setq events (delete (car events2) events))
                                                     (setq events2 (cdr events2))))
@@ -2142,9 +2069,9 @@ from getting stuck inside a little subtree.
           initially (setq chord (sortchord chord))
           for prevent on prevc
           do  (progn
-                (setf (nth (1- (note-channel (caar prevent))) chord)
-                      (or (delete (note-pitch (caar prevent))
-                                  (nth (1- (note-channel (caar prevent))) chord)
+                (setf (nth (1- (lz-note-channel (caar prevent))) chord)
+                      (or (delete (lz-note-pitch (caar prevent))
+                                  (nth (1- (lz-note-channel (caar prevent))) chord)
                                   :test #'(lambda (x y) (= (abs x) (abs y)))
                                   :key #'car)
                           0))
@@ -2158,15 +2085,15 @@ from getting stuck inside a little subtree.
 
 (defun prepare-voices (voices)
   (loop for voice in voices
-        collect (if (zerop (note-onset (first voice)))
+        collect (if (zerop (lz-note-onset (first voice)))
                   voice
-                  (cons (list 0 0 0 0 (note-channel (first voice))) voice))))
+                  (cons (list 0 0 0 0 (lz-note-channel (first voice))) voice))))
 
 (defun channelize (poly)
   (loop for voice in poly
         for channel from 1
         do (loop for note in voice
-                 do (setf (note-channel note) channel)))
+                 do (setf (lz-note-channel note) channel)))
   poly)
 
 
@@ -2294,14 +2221,13 @@ This list can serve as input to the box midi->cross.
 "
    (loop for track in midi-info
          collect (loop for event in track
-                       collect (list (+ (note-pitch event) offset)
-                                     (note-onset event)
-                                     (note-duration event)
-                                     (note-velocity event)
-                                     (note-channel event) ) ) ) )
+                       collect (list (+ (lz-note-pitch event) offset)
+                                     (lz-note-onset event)
+                                     (lz-note-duration event)
+                                     (lz-note-velocity event)
+                                     (lz-note-channel event) ) ) ) )
 
-(defmethod! Transposer ((midifile MidiFile) (offset integer))
-   (transposer (mf-info midiFile)))
+
 
 (defmethod! TimeScaler ((midi-info list) (scaler float))
    :initvals '(nil 1.0)
@@ -2323,14 +2249,12 @@ This list can serve as input to the box midi->cross.
 "
    (loop for track in midi-info
          collect (loop for event in track
-                       collect (list (note-pitch event)
-                                     (round (* scaler (note-onset event)))
-                                     (round (* scaler (note-duration event)))
-                                     (note-velocity event)
-                                     (note-channel event) ) ) ) )
+                       collect (list (lz-note-pitch event)
+                                     (round (* scaler (lz-note-onset event)))
+                                     (round (* scaler (lz-note-duration event)))
+                                     (lz-note-velocity event)
+                                     (lz-note-channel event) ) ) ) )
 
-(defmethod! TimeScaler ((midifile MidiFile) (scaler float))
-   (TimeScaler (mf-info midifile) scaler))
 
 (defmethod! Crop ((midi-info list) (begin number) (end number))
    :initvals '(nil 0 10000)
@@ -2354,17 +2278,14 @@ This list can serve as input to the box midi->cross.
 "
    (loop for track in midi-info
          collect (loop for event in track
-                       if (and (>= (note-onset event) begin) (<= (note-onset event) end))
+                       if (and (>= (lz-note-onset event) begin) (<= (lz-note-onset event) end))
                        collect (list 
-                                (note-pitch event)
-                                (- (note-onset event) begin)
-                                (note-duration event)
-                                (note-velocity event)
-                                (note-channel event)))
+                                (lz-note-pitch event)
+                                (- (lz-note-onset event) begin)
+                                (lz-note-duration event)
+                                (lz-note-velocity event)
+                                (lz-note-channel event)))
          ))
-
-(defmethod! Crop ((midifile midifile) (begin number) (end number))
-   (Crop (mf-info midifile) begin end))
 
 
 (defmethod! Midi->chordseqs ((midi-info list))
@@ -2386,8 +2307,7 @@ box.
              :LVel (fourth track2)
              :LChan (fifth track2)
              ))))
-(defmethod! Midi->chordseqs ((midifile MidiFile))
-   (Midi->chordseqs (mf-info midifile)))
+
 
 (defmethod! Midi->chordseq ((self list))
    :initvals '(nil )
@@ -2408,8 +2328,6 @@ available in the preferences of OpenMusic.
      (QNormalize newcs)
      newcs))
 
-(defmethod! Midi->chordseq ((midifile MidiFile))
-   (Midi->chordseq (mf-info midifile)))
 
 
 (defmethod! Midi->Cross ((midi-info list) &optional
@@ -2468,10 +2386,6 @@ percentage of error that is tolerated during the quantization.
 "
    (continuation midi-info legatime arpegtime releastime staccatime toltime))
 
-
-(defmethod! Midi->Cross ((midifile MidiFile) &optional
-                         (legatime nil) (arpegtime 50) (releastime 0) (staccatime 0) (toltime 10))
-   (Midi->Cross (mf-info midifile) legatime arpegtime releastime staccatime toltime))     
 
 
 (defmethod! ListMidi->Cross ((midifiles list) &optional
