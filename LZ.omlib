@@ -1,0 +1,26 @@
+(:om-lib
+ 
+ (:version 2.3)
+
+ (:author "G. Assayag")
+
+ (:source-files 
+  "sources/lz"
+  "sources/Kant")
+
+ (:symbols
+  (:packages
+    (:package 
+      (:name "LZ")
+      (:functions LZify LZGenerate subLZ LZprint LZprintreconstr LZsize LZlength LZuntree))
+    (:package 
+      (:name "PST")
+      (:functions PSTify PSTGenerate PSTprint PSTprintreconstr))
+    (:package 
+      (:name "Cross-Alphabet Sequence")
+      (:functions Midi->Cross ListMidi->Cross Cross->ChordSeq ChordSeq->Midi))
+    (:package 
+      (:name "Utilities")
+      (:functions Transposer TimeScaler Crop Midi->chordseqs))
+  ))
+)
