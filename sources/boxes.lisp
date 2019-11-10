@@ -49,11 +49,31 @@
 (defmethod! Crop ((midifile midifile) (begin number) (end number))
    (Crop (mf-info midifile) begin end))
 
-(defmethod! Midi->chordseqs ((midifile MidiFile))
-   (Midi->chordseqs (mf-info midifile)))
+
+(defmethod! Midi->chordseq ((self list))
+   :initvals '(nil )
+   :indoc '("A list, Output of a mf-info box, or the output of a MidiFile box" )
+   :icon :lz 
+   :doc  "Converts the output of a midifile box, or the output of a mf-info box 
+to a  single chord-seq object.
+The tracks will be merged, and events occuring quasi-simultaneously
+will be grouped into chords with regards to the approximation parameter 'delta value' (ms)
+available in the preferences of OpenMusic.
+"
+   (let ((newcs (make-instance 'chord-seq))
+         (midilist (sort (loop for item in self append item) '< :key 'second)))
+     (setQValue newcs 1000 :recursive nil)
+     (setf (inside newcs) nil)
+     (setf (inside newcs)  (make-quanti-chords midilist *global-deltachords*))
+     (adjust-extent newcs)
+     (QNormalize newcs)
+     newcs))
 
 (defmethod! Midi->chordseq ((midifile MidiFile))
    (Midi->chordseq (mf-info midifile)))
+
+(defmethod! Midi->chordseqs ((midifile MidiFile))
+   (Midi->chordseqs (mf-info midifile)))
 
 (defmethod! Midi->Cross ((midifile MidiFile) &optional
                          (legatime nil) (arpegtime 50) (releastime 0) (staccatime 0) (toltime 10))

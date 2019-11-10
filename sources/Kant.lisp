@@ -1251,6 +1251,7 @@ les elements communs aux groupes restants sont retires de l'un des groupes."
 
 ;************ info midi
 
+#|
 (defmethod! info-midi ((self midifile)(chan integer) &rest channel)
    :initvals '(nil '1)
    :indoc '("fichier midi" 
@@ -1278,6 +1279,7 @@ les elements communs aux groupes restants sont retires de l'un des groupes."
          ((<= (nth 1 objet) (nth 1 (car liste))) (cons objet liste))
          (t (cons (car liste) (placer-liste objet (cdr liste))))))
 
+|#
 
 ;************ fonctions bizarres !
 
@@ -1286,16 +1288,16 @@ les elements communs aux groupes restants sont retires de l'un des groupes."
 (defun l-np (nombre)
   ;renvoie la decomposition en nombres premiers de nombre
   (let ((n 1)(prime-list nil))
-    (remove 'nil (while (<= (setq n (1+ n)) nombre)
-                        (setq prime-list (append prime-list
-                                                 (if (and (or (null prime-list)
-                                                              (not (member 'nil
-                                                                           (mapcar #'(lambda (x)
-                                                                                       (/= 0 (rem n x)))
-                                                                                   prime-list) :test 'equal)))
-                                                          (equal 0 (rem nombre n)))
-                                                   (list n)
-                                                   'nil)))))
+    (remove 'nil (loop while (<= (setq n (1+ n)) nombre)
+                       do (setq prime-list (append prime-list
+                                                   (if (and (or (null prime-list)
+                                                                (not (member 'nil
+                                                                             (mapcar #'(lambda (x)
+                                                                                         (/= 0 (rem n x)))
+                                                                                     prime-list) :test 'equal)))
+                                                            (equal 0 (rem nombre n)))
+                                                       (list n)
+                                                     'nil)))))
     prime-list))
 
 (defun prox-pgcd (nombre diviseur)

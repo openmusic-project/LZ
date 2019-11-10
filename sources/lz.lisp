@@ -544,7 +544,7 @@
 (defmethod! LZlength ((tree LZtree))
    :initvals nil
    :indoc '("A LZ pattern tree or a LZ continuation tree")
-   :icon '(230) 
+   :icon :lz 
    :numouts 1
    :doc  "Finds the lengths of the longest branch of the tree.
 
@@ -564,27 +564,15 @@ an integer.
                   0))))
     (recurs tree)))
 
+
 (defmethod! LZlength ((tree LZconttree))
-   :initvals nil
-   :indoc '("A LZ pattern tree or a LZ continuation tree")
-   :icon '(230) 
-   :numouts 1
-   :doc  "Finds the lengths of the longest branch of the tree.
-
-inputs:
-
-tree: a LZ pattern tree or a LZ continuation tree
-
-output:
-
-an integer.
-"
    (LZlength (dico tree)))
+
 
 (defmethod! LZsize ((tree LZtree))
    :initvals nil
    :indoc '("A LZ pattern tree or a LZ continuation tree")
-   :icon '(230) 
+   :icon :lz 
    :numouts 1
    :doc  "Finds the size (number of nodes) of the tree.
 
@@ -604,20 +592,6 @@ an integer.
      (recurs tree)))
 
 (defmethod! LZsize ((tree LZconttree))
-   :initvals nil
-   :indoc '("A LZ pattern tree or a LZ continuation tree")
-   :icon '(230) 
-   :numouts 1
-   :doc  "Finds the size (number of nodes) of the tree.
-
-inputs:
-
-tree: a LZ pattern tree or a LZ continuation tree
-
-output:
-
-an integer.
-"
    (LZsize (dico tree)))
    
 
@@ -834,57 +808,11 @@ an integer.
       (proba tree nil))
     conttree))
 
-(defmethod LZwrite ((tree LZpatterntree))
-  (format t "~A <~A>" (symb tree) (secund tree)))
-
-(defmethod LZwrite ((tree LZcontnode))
-  (format t "~A" (symb tree))
-  ;(if (subsize tree)
-  ;  (format t " #subsize : ~A# " (subsize tree)))
-  (if (next tree)
-    (progn
-      (format t "->" (symb tree))
-      (LZwrite (next tree)))
-    (format t ".")))
-
-(defmethod LZwrite ((l list))
-  (loop for n in l
-        do (progn
-             (format t "   ~A :" (symb n))
-             ;(if (param n)
-             ;  (LZwrite (param n)))
-             (format t " ~A" (proba n))
-             ;(if (correctedproba n)
-             ;  (format t "cor : ~A" (correctedproba n)))
-             (maphash #'(lambda (x y)
-                          (format t " << ~A -> ~A >> " x y))
-                      (secund n)))))
-
-(defmethod LZwrite ((p LZparam))
-  (format t "#~A ~A ~A ~A ~A#" (maxPast p) (minPast p) (minComplex p) (equiv1 p) (equiv2 p)))
-
-(defmethod PSTwrite ((tree PSTnode))
-  (format t "~A" (symb tree))
-  (if (next tree)
-    (progn
-      (format t "->" (symb tree))
-      (PSTwrite (next tree)))
-    (format t ".")))
-
-(defmethod PSTwrite ((h hash-table))
-  (loop for symb being each hash-key of h using (hash-value proba)
-        do (progn
-             (format t "   ~A :" symb)
-             (format t " ~A" (proba proba))
-             ;(maphash #'(lambda (x y)
-             ;             (format t " << ~A -> ~A >> " x y))
-             ;         (secund n)))))
-)))
 
 (defmethod! LZify ((text list) (niter integer) &optional (type 'pitch_durationvelocity))
-   :initvals '(nil 1 'pitch_durationvelocity)
+   :initvals '(nil 1 pitch_durationvelocity)
    :indoc '("A list of anything" "An integer" "A list of 3 functions")
-   :icon '(230) 
+   :icon :lz 
    :numouts 2
    :doc  "Builds a pattern dictionary containing a statistical model.
 
@@ -918,21 +846,21 @@ for the maximum context, and the continuations of each context are explicitly re
 with their corresponding probabilities.
 
 "
-   :menuins '((2 (("pitch_duration" 'pitch_duration)
-                 ("pitch_durationvelocity" 'pitch_durationvelocity)
-                 ("pitchduration_nothing" 'pitchduration_nothing)
-                 ("pitchduration_velocity" 'pitchduration_velocity)
-                 ("newpitch_durationoldpitch" 'newpitch_durationoldpitch)
-                 ("newpitch_durationoldpitchvelocity" 'newpitch_durationoldpitchvelocity)
-                 ("newpitchduration_oldpitch" 'newpitchduration_oldpitch)
-                 ("newpitchduration_oldpitchvelocity" 'newpitchduration_oldpitchvelocity)
-                 ("pitch_duration_last" 'pitch_duration_last)
-                 ("pitch_durationvelocity_last" 'pitch_durationvelocity_last)
-                 ("pitch_duration_last_velocity" 'pitch_duration_last_velocity)
-                 ("newpitch_durationoldpitch_last" 'newpitch_durationoldpitch_last)
-                 ("newpitch_durationoldpitchvelocity_last" 'newpitch_durationoldpitchvelocity_last)
-                 ("newpitch_duration_last_oldpitchvelocity_last" 'newpitch_duration_last_oldpitchvelocity_last)
-                 ("all_nothing" 'degenerated))))
+   :menuins '((2 (("pitch_duration" pitch_duration)
+                 ("pitch_durationvelocity" pitch_durationvelocity)
+                 ("pitchduration_nothing" pitchduration_nothing)
+                 ("pitchduration_velocity" pitchduration_velocity)
+                 ("newpitch_durationoldpitch" newpitch_durationoldpitch)
+                 ("newpitch_durationoldpitchvelocity" newpitch_durationoldpitchvelocity)
+                 ("newpitchduration_oldpitch" newpitchduration_oldpitch)
+                 ("newpitchduration_oldpitchvelocity" newpitchduration_oldpitchvelocity)
+                 ("pitch_duration_last" pitch_duration_last)
+                 ("pitch_durationvelocity_last" pitch_durationvelocity_last)
+                 ("pitch_duration_last_velocity" pitch_duration_last_velocity)
+                 ("newpitch_durationoldpitch_last" newpitch_durationoldpitch_last)
+                 ("newpitch_durationoldpitchvelocity_last" newpitch_durationoldpitchvelocity_last)
+                 ("newpitch_duration_last_oldpitchvelocity_last" newpitch_duration_last_oldpitchvelocity_last)
+                 ("all_nothing" degenerated))))
    (labels ((ftype (x)
               (eql type x)))
      (let ((tree (make-instance 'LZpatterntree)))
@@ -984,9 +912,9 @@ with their corresponding probabilities.
 
 
 (defmethod! PSTify ((text list) (Pmin float) (a float) (ymin float) (r float) (L integer) &optional (type 'pitch_durationvelocity))
-   :initvals '(nil 0.1 0.1 0.01 2 10 'pitch_durationvelocity)
+   :initvals '(nil 0.1 0.1 0.01 2 10 pitch_durationvelocity)
    :indoc '("A list of anything" "A float" "A float" "A float" "A float" "An integer" "A list of 3 functions")
-   :icon '(230) 
+   :icon :lz 
    :numouts 1
    :doc  "Builds a pattern suffix tree modeling the text.
 
@@ -1008,21 +936,21 @@ output:
 a PST (Prediction Suffix Tree)
 
 "
-   :menuins '((6 (("pitch_duration" 'pitch_duration)
-                 ("pitch_durationvelocity" 'pitch_durationvelocity)
-                 ("pitchduration_nothing" 'pitchduration_nothing)
-                 ("pitchduration_velocity" 'pitchduration_velocity)
-                 ("newpitch_durationoldpitch" 'newpitch_durationoldpitch)
-                 ("newpitch_durationoldpitchvelocity" 'newpitch_durationoldpitchvelocity)
-                 ("newpitchduration_oldpitch" 'newpitchduration_oldpitch)
-                 ("newpitchduration_oldpitchvelocity" 'newpitchduration_oldpitchvelocity)
-                 ("pitch_duration_last" 'pitch_duration_last)
-                 ("pitch_durationvelocity_last" 'pitch_durationvelocity_last)
-                 ("pitch_duration_last_velocity" 'pitch_duration_last_velocity)
-                 ("newpitch_durationoldpitch_last" 'newpitch_durationoldpitch_last)
-                 ("newpitch_durationoldpitchvelocity_last" 'newpitch_durationoldpitchvelocity_last)
-                 ("newpitch_duration_last_oldpitchvelocity_last" 'newpitch_duration_last_oldpitchvelocity_last)
-                 ("all_nothing" 'degenerated))))
+   :menuins '((6 (("pitch_duration" pitch_duration)
+                 ("pitch_durationvelocity" pitch_durationvelocity)
+                 ("pitchduration_nothing" pitchduration_nothing)
+                 ("pitchduration_velocity" pitchduration_velocity)
+                 ("newpitch_durationoldpitch" newpitch_durationoldpitch)
+                 ("newpitch_durationoldpitchvelocity" newpitch_durationoldpitchvelocity)
+                 ("newpitchduration_oldpitch" newpitchduration_oldpitch)
+                 ("newpitchduration_oldpitchvelocity" newpitchduration_oldpitchvelocity)
+                 ("pitch_duration_last" pitch_duration_last)
+                 ("pitch_durationvelocity_last" pitch_durationvelocity_last)
+                 ("pitch_duration_last_velocity" pitch_duration_last_velocity)
+                 ("newpitch_durationoldpitch_last" newpitch_durationoldpitch_last)
+                 ("newpitch_durationoldpitchvelocity_last" newpitch_durationoldpitchvelocity_last)
+                 ("newpitch_duration_last_oldpitchvelocity_last" newpitch_duration_last_oldpitchvelocity_last)
+                 ("all_nothing" degenerated))))
    (labels ((ftype (x)
               (eql type x)))
      (make-instance 'PST
@@ -1066,10 +994,69 @@ a PST (Prediction Suffix Tree)
                    (caddr type)
                    (symbol-function type)))))
 
+
+
+;;;================================
+;;; PRINT TOOLS
+;;;================================
+
+(defvar *lz-out* om-lisp::*om-stream*)
+
+
+(defmethod LZwrite ((tree LZpatterntree))
+  (format *lz-out* "~A <~A>" (symb tree) (secund tree)))
+
+(defmethod LZwrite ((tree LZcontnode))
+  (format *lz-out* "~A" (symb tree))
+  ;(if (subsize tree)
+  ;  (format *lz-out* " #subsize : ~A# " (subsize tree)))
+  (if (next tree)
+    (progn
+      (format *lz-out* "->" (symb tree))
+      (LZwrite (next tree)))
+    (format *lz-out* ".")))
+
+(defmethod LZwrite ((l list))
+  (loop for n in l
+        do (progn
+             (format *lz-out* "   ~A :" (symb n))
+             ;(if (param n)
+             ;  (LZwrite (param n)))
+             (format *lz-out* " ~A" (proba n))
+             ;(if (correctedproba n)
+             ;  (format t "cor : ~A" (correctedproba n)))
+             (maphash #'(lambda (x y)
+                          (format *lz-out* " << ~A -> ~A >> " x y))
+                      (secund n)))))
+
+(defmethod LZwrite ((p LZparam))
+  (format *lz-out* "#~A ~A ~A ~A ~A#" (maxPast p) (minPast p) (minComplex p) (equiv1 p) (equiv2 p)))
+
+(defmethod PSTwrite ((tree PSTnode))
+  (format *lz-out* "~A" (symb tree))
+  (if (next tree)
+    (progn
+      (format *lz-out* "->" (symb tree))
+      (PSTwrite (next tree)))
+    (format *lz-out* ".")))
+
+(defmethod PSTwrite ((h hash-table))
+  (loop for symb being each hash-key of h using (hash-value proba)
+        do (progn
+             (format *lz-out* "   ~A :" symb)
+             (format *lz-out* " ~A" (proba proba))
+             ;(maphash #'(lambda (x y)
+             ;             (format *lz-out* " << ~A -> ~A >> " x y))
+             ;         (secund n)))))
+)))
+
+
+
+
 (defmethod! LZprint ((tree LZtree))
    :initvals '(nil)
    :indoc '("A LZ pattern tree or a LZ continuation tree")
-   :icon '(230) 
+   :icon :lz 
    :doc  "Print a given pattern dictionnary.
 
 inputs:
@@ -1082,38 +1069,26 @@ nil
 
 "
    (labels ((recurs (tr n)
-              (terpri)
+              (terpri *lz-out*)
               (loop for i=0 to n
-                    do (format *standard-output* "~5,5T"))
+                    do (format *lz-out* "~5,5T"))
               (LZwrite tr)
               (mapcar #'(lambda (x) (recurs x (1+ n)))
                       (children tr))
               nil))
-     (recurs tree 0)))
+     (recurs tree 0)
+     (terpri *lz-out*)))
 
 (defmethod! LZprint ((tree LZconttree))
-   :initvals '(nil)
-   :indoc '("A LZ pattern tree or a LZ continuation tree")
-   :icon '(230) 
-   :doc  "Print a given pattern dictionnary.
-
-inputs:
-
-tree: a LZ pattern tree or a LZ continuation tree generated by the LZify function.
-
-output:
-
-nil
-
-"
    (LZprint (dico tree))
-   (terpri)
-   (pprint (reconstr tree)))
+   (terpri *lz-out*)
+   (pprint  (reconstr tree) *lz-out*)
+   (terpri *lz-out*))
 
 (defmethod! PSTprint ((tree PSTnode))
    :initvals '(nil)
    :indoc '("A PST")
-   :icon '(230) 
+   :icon :lz 
    :doc  "Print a given PST.
 
 inputs:
@@ -1126,9 +1101,9 @@ nil
 
 "
    (labels ((recurs (tr n)
-              (terpri)
+              (terpri *lz-out*)
               (loop for i=0 to n
-                    do (format *standard-output* "~5,5T"))
+                    do (format *lz-out* "~5,5T"))
               (PSTwrite tr)
               (mapcar #'(lambda (x) (recurs x (1+ n)))
                       (children tr))
@@ -1136,28 +1111,15 @@ nil
      (recurs tree 0)))
 
 (defmethod! PSTprint ((tree PST))
-   :initvals '(nil)
-   :indoc '("A PST")
-   :icon '(230) 
-   :doc  "Print a given pattern dictionnary.
-
-inputs:
-
-tree: a LZ pattern tree or a LZ continuation tree generated by the LZify function.
-
-output:
-
-nil
-
-"
    (PSTprint (dico tree))
-   (terpri)
-   (pprint (reconstr tree)))
+   (terpri *lz-out*)
+   (pprint (reconstr tree) *lz-out*)
+   (terpri *lz-out*))
 
 (defmethod! LZprintreconstr ((tree LZconttree))
    :initvals '(nil)
    :indoc '("A LZ continuation tree")
-   :icon '(230) 
+   :icon :lz 
    :doc  "Indicates the reconstr function used by the continuation tree.
 
 inputs:
@@ -1169,18 +1131,23 @@ output:
 nil
 
 "
-   (pprint (reconstr tree)))
+   (pprint (reconstr tree) *lz-out*)
+   (terpri *lz-out*))
+
 
 (defmethod! LZprint ((nothing null))
-   (write nil))
+   (write nil :stream *lz-out*))
 
 (defmethod! PSTprint ((nothing null))
-   (write nil))
+   (write nil :stream *lz-out*))
+
+
+;;;================================================================
 
 (defmethod! LZuntree ((tree LZtree) &optional (delay 100))
    :initvals '(nil 100)
    :indoc '("A LZ pattern tree or a LZ continuation tree" "An integer")
-   :icon '(230)
+   :icon :lz
    :doc  "Appends all the patters of a given pattern dictionnary, separating one from each other by a delay.
 
 inputs:
@@ -1212,7 +1179,7 @@ A sequence of patterns.
 (defmethod! LZuntree ((tree LZconttree) &optional (delay 100))
    :initvals '(nil 100)
    :indoc '("A LZ pattern tree or a LZ continuation tree" "An integer")
-   :icon '(230) 
+   :icon :lz 
    :doc  "Appends all the patters of a given pattern dictionnary, separating one from each other by a delay.
 
 inputs:
@@ -1248,10 +1215,10 @@ A sequence of patterns.
                         &optional (minPast 0)
                         (incipit1 nil) (incipit2 nil) (reconstr nil) (strategy 'randomchoice)
                         (constraints nil) (equiv1 'equal) (equiv2 'equal2))
-   :initvals '(nil 50 0 nil nil nil 'randomchoice  nil 'equal 'equal2)
+   :initvals '(nil 50 0 nil nil nil randomchoice  nil equal equal2)
    :indoc '("A PST" "An integer" "An integer (optional)" "A list (optional)" "A list (optional)" "nil or a function name (optional)"
             "A function name (optional)" "A function name (optional)" "A function name (optional)" "A function name (optional)")
-   :icon '(230)
+   :icon :lz
    :numouts 1
    :doc  
    "Generates a new sequence following the model of a given PST (generated by the PSTify function).
@@ -1289,23 +1256,23 @@ ry. If no sequence can respect the constraint, PSTGenerate returns nil.
 Thanks to the minPast parameter, you can prevent PSTGenerate from generating with no or little context.
 "
    :menuins '((8 (("default function" nil)
-                 ("pitch_duration" 'pitch_duration)
-                 ("pitch_durationvelocity" 'pitch_durationvelocity)
-                 ("pitchduration_nothing" 'pitchduration_nothing)
-                 ("pitchduration_velocity" 'pitchduration_velocity)
-                 ("newpitch_durationoldpitch" 'newpitch_durationoldpitch)
-                 ("newpitch_durationoldpitchvelocity" 'newpitch_durationoldpitchvelocity)
-                 ("newpitchduration_oldpitch" 'newpitchduration_oldpitch)
-                 ("newpitchduration_oldpitchvelocity" 'newpitchduration_oldpitchvelocity)
-                 ("pitch_duration_last" 'pitch_duration_last)
-                 ("pitch_durationvelocity_last" 'pitch_durationvelocity_last)
-                 ("pitch_duration_last_velocity" 'pitch_duration_last_velocity)
-                 ("newpitch_durationoldpitch_last" 'newpitch_durationoldpitch_last) 
-                 ("newpitch_durationoldpitchvelocity_last" 'newpitch_durationoldpitchvelocity_last)
-                 ("newpitch_duration_last_oldpitchvelocity_last" 'newpitch_duration_last_oldpitchvelocity_last)))
-             (9 (("random choice" 'randomchoice)
-                 ("duration : nearest last durations" 'duration_nearestlast)
-                 ("duration,etc. : nearest last durations" 'duration_nearestlast_velocity))))
+                 ("pitch_duration" pitch_duration)
+                 ("pitch_durationvelocity" pitch_durationvelocity)
+                 ("pitchduration_nothing" pitchduration_nothing)
+                 ("pitchduration_velocity" pitchduration_velocity)
+                 ("newpitch_durationoldpitch" newpitch_durationoldpitch)
+                 ("newpitch_durationoldpitchvelocity" newpitch_durationoldpitchvelocity)
+                 ("newpitchduration_oldpitch" newpitchduration_oldpitch)
+                 ("newpitchduration_oldpitchvelocity" newpitchduration_oldpitchvelocity)
+                 ("pitch_duration_last" pitch_duration_last)
+                 ("pitch_durationvelocity_last" pitch_durationvelocity_last)
+                 ("pitch_duration_last_velocity" pitch_duration_last_velocity)
+                 ("newpitch_durationoldpitch_last" newpitch_durationoldpitch_last) 
+                 ("newpitch_durationoldpitchvelocity_last" newpitch_durationoldpitchvelocity_last)
+                 ("newpitch_duration_last_oldpitchvelocity_last" newpitch_duration_last_oldpitchvelocity_last)))
+             (9 (("random choice" randomchoice)
+                 ("duration : nearest last durations" duration_nearestlast)
+                 ("duration,etc. : nearest last durations" duration_nearestlast_velocity))))
    
 (if (or (> minPast 0) constraints)
      (PSTGeneratecont (dico dict) Length minPast incipit1 incipit2
@@ -1416,11 +1383,11 @@ Thanks to the minPast parameter, you can prevent PSTGenerate from generating wit
                         &optional (mostprobable t) (minPast 0) (minComplex 0)
                         (incipit1 nil) (incipit2 nil) (reconstr nil) (strategy 'randomchoice)
                         (constraints nil) (equiv1 'equal) (equiv2 'equal2))
-   :initvals '(nil nil 50 t 0 0 nil nil nil 'randomchoice  nil 'equal 'equal2)
+   :initvals '(nil nil 50 t 0 0 nil nil nil randomchoice  nil equal equal2)
    :indoc '("A LZ continuation tree" "An integer or nil"
             "An integer" "t or nil (optional)" "An integer (optional)" "An integer (optional)" "A list (optional)" "A list (optional)" "nil or a function name (optional)"
             "A function name (optional)" "A function name (optional)" "A function name (optional)" "A function name (optional)")
-   :icon '(230)
+   :icon :lz
    :numouts 1
    :doc  
    "Generates a new sequence following the model of a given LZ continuation tree (generated by the LZify function).
@@ -1470,23 +1437,23 @@ this in order to get out of this subtree. Thanks to the minContext parameter, yo
 from getting stuck inside a little subtree.
 "
    :menuins '((8 (("default function" nil)
-                 ("pitch_duration" 'pitch_duration)
-                 ("pitch_durationvelocity" 'pitch_durationvelocity)
-                 ("pitchduration_nothing" 'pitchduration_nothing)
-                 ("pitchduration_velocity" 'pitchduration_velocity)
-                 ("newpitch_durationoldpitch" 'newpitch_durationoldpitch)
-                 ("newpitch_durationoldpitchvelocity" 'newpitch_durationoldpitchvelocity)
-                 ("newpitchduration_oldpitch" 'newpitchduration_oldpitch)
-                 ("newpitchduration_oldpitchvelocity" 'newpitchduration_oldpitchvelocity)
-                 ("pitch_duration_last" 'pitch_duration_last)
-                 ("pitch_durationvelocity_last" 'pitch_durationvelocity_last)
-                 ("pitch_duration_last_velocity" 'pitch_duration_last_velocity)
-                 ("newpitch_durationoldpitch_last" 'newpitch_durationoldpitch_last) 
-                 ("newpitch_durationoldpitchvelocity_last" 'newpitch_durationoldpitchvelocity_last)
-                 ("newpitch_duration_last_oldpitchvelocity_last" 'newpitch_duration_last_oldpitchvelocity_last)))
-             (9 (("random choice" 'randomchoice)
-                 ("duration : nearest last durations" 'duration_nearestlast)
-                 ("duration,etc. : nearest last durations" 'duration_nearestlast_velocity))))
+                 ("pitch_duration" pitch_duration)
+                 ("pitch_durationvelocity" pitch_durationvelocity)
+                 ("pitchduration_nothing" pitchduration_nothing)
+                 ("pitchduration_velocity" pitchduration_velocity)
+                 ("newpitch_durationoldpitch" newpitch_durationoldpitch)
+                 ("newpitch_durationoldpitchvelocity" newpitch_durationoldpitchvelocity)
+                 ("newpitchduration_oldpitch" newpitchduration_oldpitch)
+                 ("newpitchduration_oldpitchvelocity" newpitchduration_oldpitchvelocity)
+                 ("pitch_duration_last" pitch_duration_last)
+                 ("pitch_durationvelocity_last" pitch_durationvelocity_last)
+                 ("pitch_duration_last_velocity" pitch_duration_last_velocity)
+                 ("newpitch_durationoldpitch_last" newpitch_durationoldpitch_last) 
+                 ("newpitch_durationoldpitchvelocity_last" newpitch_durationoldpitchvelocity_last)
+                 ("newpitch_duration_last_oldpitchvelocity_last" newpitch_duration_last_oldpitchvelocity_last)))
+             (9 (("random choice" randomchoice)
+                 ("duration : nearest last durations" duration_nearestlast)
+                 ("duration,etc. : nearest last durations" duration_nearestlast_velocity))))
    
 (if (or (> minPast 0) (> minComplex 0) constraints)
      (LZGeneratecont (dico dict) Length maxPast minPast minComplex incipit1 incipit2
@@ -2185,16 +2152,12 @@ from getting stuck inside a little subtree.
 
 
 
-
-
 (defun Midi->textfile (pitch-list)
-  (catch-cancel
-    (let ((name (choose-new-file-dialog    
-                 :prompt "Save pitches to:")))
-      (when name
-        (with-open-file (file name :if-exists :overwrite :direction :output)
-          (loop for pitch in pitch-list
-                do (format file "~D~%" pitch )) )))))
+  (let ((name (om-choose-new-file-dialog :prompt "Save pitches to:")))
+    (when name
+      (with-open-file (file name :if-exists :overwrite :direction :output)
+        (loop for pitch in pitch-list
+              do (format file "~D~%" pitch))))))
 
 
 
@@ -2203,7 +2166,7 @@ from getting stuck inside a little subtree.
 (defmethod! Transposer ((midi-info list) (offset integer))
    :initvals '(nil 0)
    :indoc '("A list, Output of a mf-info box" "An integer")
-   :icon '(230) 
+   :icon :lz 
    :doc  "Transposes the Midi Information (given by mf-info) by <offset> semitones.
 inputs:
 
@@ -2232,7 +2195,7 @@ This list can serve as input to the box midi->cross.
 (defmethod! TimeScaler ((midi-info list) (scaler float))
    :initvals '(nil 1.0)
    :indoc '("A list, Output of a mf-info box" "A float")
-   :icon '(230) 
+   :icon :lz 
    :doc  "Time scales the Midi Info by <scaler>.
 
 midi-info : a list given by the mf-info box
@@ -2259,7 +2222,7 @@ This list can serve as input to the box midi->cross.
 (defmethod! Crop ((midi-info list) (begin number) (end number))
    :initvals '(nil 0 10000)
    :indoc '("A list, Output of a mf-info box" "A number" "A number")
-   :icon '(230) 
+   :icon :lz 
    :doc  "Crops the Midi Info from time <begin> to <end>.
 
 inputs:
@@ -2289,9 +2252,9 @@ This list can serve as input to the box midi->cross.
 
 
 (defmethod! Midi->chordseqs ((midi-info list))
-   :initvals '(nil )
+   :initvals '(nil)
    :indoc '("A list, Output of a mf-info box, or the output of a MidiFile box" )
-   :icon '(230) 
+   :icon :lz 
    :doc  "Converts the output of a midifile box, or the output of a mf-info box 
 to a list of chord-seqs (1 per midi track).
 This list may conveniently be input into the 'chord-seqs' input of a multi-seq
@@ -2309,33 +2272,13 @@ box.
              ))))
 
 
-(defmethod! Midi->chordseq ((self list))
-   :initvals '(nil )
-   :indoc '("A list, Output of a mf-info box, or the output of a MidiFile box" )
-   :icon '(230) 
-   :doc  "Converts the output of a midifile box, or the output of a mf-info box 
-to a  single chord-seq object.
-The tracks will be merged, and events occuring quasi-simultaneously
-will be grouped into chords with regards to the approximation parameter 'delta value' (ms)
-available in the preferences of OpenMusic.
-"
-   (let ((newcs (make-instance 'chord-seq))
-         (midilist (sort (loop for item in self append item) '< :key 'second)))
-     (setQValue newcs 1000 :recursive nil)
-     (setf (inside newcs) nil)
-     (setf (inside newcs)  (make-quanti-chords midilist *global-deltachords*))
-     (adjust-extent newcs)
-     (QNormalize newcs)
-     newcs))
-
-
 
 (defmethod! Midi->Cross ((midi-info list) &optional
                          (legatime nil) (arpegtime 50) (releastime nil) (staccatime nil) (toltime 0))
    :initvals '(nil nil 50 nil nil 0)
    :indoc '("A list, Output of a midi-info box" "An integer, max legato time (ms)" "An integer, min arpeggio time (ms)"
             "An integer, max release synchro time (ms) (optional)" "An integer, max staccato time (ms) (optional)" "An integer (optional)")
-   :icon '(230) 
+   :icon :lz 
    :doc  "Transforms the output of a MidiFile into a pitch/duration Cross-Alphabet sequence.
 
 input : a <MidiFile> object from a midifile box, or a list from a mf-info box.
@@ -2393,7 +2336,7 @@ percentage of error that is tolerated during the quantization.
   :initvals '((nil) nil 50 nil nil 0)
   :indoc '("A list of Outputs of midi-info boxes" "An integer, max legato time (ms)" "An integer, min arpeggio time (ms)"
            "An integer, max release-synchro time (ms) (optional)" "An integer, max staccato time (ms) (optional)" "An integer (optional)")
-  :icon '(230) 
+  :icon :lz 
   :doc  "Transforms the outputs of MidiFiles into a pitch/duration Cross-Alphabet sequence.
 
 input : a list of midi-info lists from  mf-info boxes.
@@ -2449,7 +2392,7 @@ percentage of error that is tolerated during the quantization.
 (defmethod! ChordSeq->Midi ((chordseq chord-seq))
    :initvals '(nil)
    :indoc '("A chordseq")
-   :icon '(230) 
+   :icon :lz 
    :doc  "Transforms a chord-seq into a mf info.
 
 input : a Chord-Seq.
@@ -2469,7 +2412,7 @@ output : a mf-info.
 (defmethod! Cross->ChordSeq ((Cross list) &optional (time-coef 1.0))
    :initvals '(nil 1.0)
    :indoc '("A cross-alphabet sequence" "Time scaling coef.")
-   :icon '(230) 
+   :icon :lz 
    :doc  "Transforms a Cross-Alphabet sequence into a chord-seq.
 
 inputs :
