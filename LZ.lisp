@@ -11,7 +11,8 @@
 
 (defvar *LZ-lib-files* nil)
 (setf *LZ-lib-files* (list (om::om-relative-path '("sources") "lz")
-                           (om::om-relative-path '("sources") "Kant")))
+                           (om::om-relative-path '("sources") "Kant")
+                           (om::om-relative-path '("sources") "boxes")))
 
 ;--------------------------------------------------
 ;Loading files 
@@ -40,4 +41,4 @@
 (om::fill-library *subpackages-list*)
 
 
-(om::set-lib-release 2.2)
+(om::set-lib-release 2.3)
