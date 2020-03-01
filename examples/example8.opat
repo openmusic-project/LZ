@@ -5,8 +5,8 @@
  (:doc "")
  (:info
   (:created "2019/11/10 13:39:41")
-  (:modified "2019/11/10 15:13:54"))
- (:window (:size (600 514)) (:position (470 75)))
+  (:modified "2019/11/19 12:51:59"))
+ (:window (:size (600 514)) (:position (724 111)))
  (:grid nil)
  (:lock nil)
  (:boxes
@@ -15,8 +15,8 @@
    (:reference pitch_onlychord)
    (:group-id nil)
    (:name "pitch_onlychord")
-   (:x 373)
-   (:y 181)
+   (:x 359)
+   (:y 184)
    (:w 117)
    (:h 30)
    (:color nil)
@@ -24,7 +24,6 @@
    (:roundness nil)
    (:text-font nil)
    (:align nil)
-   (:icon :left)
    (:lock nil)
    (:lambda nil)
    (:inputs)
@@ -44,7 +43,6 @@
    (:roundness nil)
    (:text-font nil)
    (:align nil)
-   (:icon :left)
    (:lock nil)
    (:lambda nil)
    (:inputs)
@@ -118,7 +116,6 @@
    (:roundness nil)
    (:text-font nil)
    (:align nil)
-   (:icon :left)
    (:lock nil)
    (:lambda nil)
    (:inputs
@@ -143,7 +140,6 @@
    (:roundness nil)
    (:text-font nil)
    (:align nil)
-   (:icon :left)
    (:lock nil)
    (:lambda nil)
    (:inputs
@@ -215,8 +211,8 @@
    (:value 10)
    (:id 9))
   (:comment
-   (:x 273)
-   (:y 55)
+   (:x 267)
+   (:y 35)
    (:w 225)
    (:h 30)
    (:fgcolor (:color 79/85 8/85 2/17 1.0))
@@ -292,7 +288,7 @@
     (:output (:name "loffset") (:reactive nil))
     (:output (:name "lchan") (:reactive nil))
     (:output (:name "llegato") (:reactive nil)))
-   (:window (:size nil) (:position nil))
+   (:window (:size (nil nil)) (:position (nil nil)))
    (:edition-params (:staff :g))
    (:value
     (:object
@@ -686,7 +682,6 @@
    (:roundness nil)
    (:text-font nil)
    (:align nil)
-   (:icon :left)
    (:lock nil)
    (:lambda nil)
    (:inputs
@@ -711,7 +706,6 @@
    (:roundness nil)
    (:text-font nil)
    (:align nil)
-   (:icon :left)
    (:lock nil)
    (:lambda nil)
    (:inputs
@@ -786,7 +780,6 @@
    (:roundness nil)
    (:text-font nil)
    (:align nil)
-   (:icon :left)
    (:lock nil)
    (:lambda nil)
    (:inputs
@@ -823,7 +816,6 @@
    (:roundness nil)
    (:text-font nil)
    (:align nil)
-   (:icon :left)
    (:lock nil)
    (:lambda nil)
    (:inputs
@@ -839,8 +831,8 @@
    (:reference midi-track)
    (:group-id nil)
    (:name "midifile")
-   (:x 30)
-   (:y 28)
+   (:x 36)
+   (:y 27)
    (:w 174)
    (:h 72)
    (:color nil)
@@ -867,7 +859,7 @@
    (:outputs
     (:output (:name "SELF") (:reactive nil))
     (:output (:name "MIDI-EVENTS") (:reactive nil)))
-   (:window (:size nil) (:position nil))
+   (:window (:size (nil nil)) (:position (nil nil)))
    (:edition-params)
    (:value
     (:object
