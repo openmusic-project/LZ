@@ -56,8 +56,8 @@
    
    :indoc '("liste de poids" "position des parentheses en fonction des poids forts"
             "liste de 0 et de 1. Les 1 determinent les positions des parentheses voulues"
-            "booleen indiquant si deux memes valeurs consecutives doivent etre separees par des parenthses"
-            "booleen indiquant si deux valeurs non nulles consecutives doivent etre separees par des parenthses")
+            "booleen indiquant si deux memes valeurs consecutives doivent etre separees par des parenthÂses"
+            "booleen indiquant si deux valeurs non nulles consecutives doivent etre separees par des parenthÂses")
    :doc "renvoie le parenthesage de la liste de poids : 
 une parenthese fermante se trouve apres chaque poids localement fort"
    (unless (null liste)
@@ -90,7 +90,7 @@ une parenthese fermante se trouve apres chaque poids localement fort"
 (defmethod! k-appliquer-parenthesage (parenthesage (valeurs list))
    :initvals '(nil nil)
    :icon 128
-   :indoc '("parenthesage" "liste de valeurs ou termes devant tre parentheses")
+   :indoc '("parenthesage" "liste de valeurs ou termes devant Âtre parentheses")
    :doc "applique le parenthesage 'parenthesage aux termes du champ 'valeur"
    (car (k-appliquer-parenthesage-1 parenthesage valeurs)))
 
@@ -98,7 +98,7 @@ une parenthese fermante se trouve apres chaque poids localement fort"
 (defmethod! k-appliquer-parenthesage-1 (parenthesage (valeurs list))
    :initvals '(nil nil)
    :icon 128
-   :indoc '("parenthesage" "liste de valeurs ou termes devant tre parentheses")
+   :indoc '("parenthesage" "liste de valeurs ou termes devant Âtre parentheses")
    :doc "applique le parenthesage 'parenthesage aux termes du champ 'valeur"
    (cond ((null parenthesage) (list nil valeurs))
          ((null valeurs) (list parenthesage nil))
@@ -259,7 +259,7 @@ entre ses termes consecutifs."
 
 
 (defun remove-pulse-duplicate (lpuls-new on lpuls taille-approx)
-  ;compare les differentes pulsations et elimine les pulsations trs proches dupliquees
+  ;compare les differentes pulsations et elimine les pulsations trÂs proches dupliquees
   (append (mapcan #'(lambda(a) (let ((puls (nth 2 (car (member (car (member (car a) (nth 4 (mat-trans lpuls))
                                                                             :test (lambda(a b) 
                                                                                     (< (/ (abs (- a b)) b) taille-approx)))) lpuls :test 'member)))))
@@ -467,7 +467,7 @@ entre ses termes consecutifs."
 
 
 (defun marquage-marq1 (lon contexte)
-  ;donne un poids de x a l'onset repetant l'i-o-i le precedant pour la x ime fois
+  ;donne un poids de x a l'onset repetant l'i-o-i le precedant pour la x iÂme fois
   (cond ((null (cdr lon)) nil)
         ((null contexte)
          (cons 0 
@@ -608,7 +608,7 @@ ete ponderes par les elements de l-poids"
   :indoc '("liste de poids" "liste a ponderer")
   :doc "renvoie l-onsets dont les elements (nuls et non nuls)
 ont ete ponderes des elements de l-poids. Des elements successifs 
-egaux sont ponderes par la mme valeur  "
+egaux sont ponderes par la mÂme valeur  "
   (let ((l-poids-1 (cons '0 l-poids))(elt nil))
     (mapcar #'(lambda (a)
                 (cond ((equal a elt) (* a (car l-poids-1)))
@@ -741,7 +741,7 @@ egaux seul le dernier est pondere  "
   :initvals '((6000 6400 6700) (6400 6700 7200) (6400 6900 7200) (6500 6900 7200 7550) (7050 7400 7700))
   :icon 128
   :indoc '("liste de hauteurs en midicents")
-  :doc "ramne toutes les hauteurs dans la mme octave (definie par la note la plus basse) et elimine les elements redondants
+  :doc "ramÂne toutes les hauteurs dans la mÂme octave (definie par la note la plus basse) et elimine les elements redondants
 exprime les intervalles entre la basse et les autres notes de l'accord (en midicents)"
   (if (listp (car liste))
     (mapcar #'abstract-accord liste)
@@ -808,7 +808,7 @@ Exemples :
   :initvals '(nil)
   ;:icon 128
   :indoc '("liste")
-  :doc "renvoie liste aprs avoir elimine les repetitions
+  :doc "renvoie liste aprÂs avoir elimine les repetitions
 de termes non nuls"
   
   (cond ((null liste) nil)
@@ -878,8 +878,8 @@ inferieures a valeur"
   :initvals '(nil 0)
   ;:icon 128
   :indoc '("liste" "valeur dont on recherche la position")
-  :doc "renvoie la premire position qu'occupe 
-valeur dans liste, nil si valeur n'appara”t pas"
+  :doc "renvoie la premiÂre position qu'occupe 
+valeur dans liste, nil si valeur n'apparaâ€t pas"
   (let ((result (pos-char-1 liste valeur)))
     (if (null result) nil (- (length liste) result))))
 
@@ -893,8 +893,8 @@ valeur dans liste, nil si valeur n'appara”t pas"
   :initvals '(nil (0 nil))
   ;:icon 128
   :indoc '("liste" "liste du ou des elements a supprimer de liste")
-  :doc "renvoie liste aprs avoir elimine
-les elements specifies en deuxime entree"
+  :doc "renvoie liste aprÂs avoir elimine
+les elements specifies en deuxiÂme entree"
 
   (cond ((null liste) nil)
         ((member (car liste) l :test 'equal) (filter-atom (cdr liste) l))
@@ -1036,17 +1036,17 @@ les elements specifies en deuxime entree"
    :indoc '("liste de valeurs" 
             "ecart tolere en pourcentage des valeurs de 'liste"
             "nombre-minimum d'elements pouvant former un groupe"
-            "nombre de points de recherche entre les deux valeurs extmes de la liste (par defaut initialise a 100)")
-   :doc "Modifie les valeurs de 'liste' de manire a mettre en evidence des regularites.
+            "nombre de points de recherche entre les deux valeurs extÂmes de la liste (par defaut initialise a 100)")
+   :doc "Modifie les valeurs de 'liste' de maniÂre a mettre en evidence des regularites.
 Procedure :
-Cherche les elements de la liste appartenant a un mme intervalle puis leur donne une mme
+Cherche les elements de la liste appartenant a un mÂme intervalle puis leur donne une mÂme
 valeur moyenne.
 Un grand nombre de groupes de valeurs est d'abord cree,
 specifie par l'entree optionelle 'nombre-de-groupes.
 (Par defaut on prend 100 valeurs caracteristiques reparties uniformement entre les deux 
-     valeurs extrmes de la liste donnee en entree).
+     valeurs extrÂmes de la liste donnee en entree).
 Chaque groupe est centre sur une valeur caracteristique.
-Ces groupes sont ensuite filtres par les critres suivants :
+Ces groupes sont ensuite filtres par les critÂres suivants :
 1) sont retenus les groupes ayant le plus grand nombre de valeurs
 2) sont retenus les groupes dont la moyenne des valeurs est la plus proche
 de la valeur caracteristique du groupe
